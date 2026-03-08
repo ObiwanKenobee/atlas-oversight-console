@@ -8,7 +8,8 @@ import { AlternativesPanel } from "@/components/dashboard/AlternativesPanel";
 import { AuditTrail } from "@/components/dashboard/AuditTrail";
 import { HumanOverrideConsole } from "@/components/dashboard/HumanOverrideConsole";
 import { AlertCenter } from "@/components/dashboard/AlertCenter";
-import { LayoutGrid, Eye, Scale, History, Menu, X, ChevronRight } from "lucide-react";
+import { DataHealthMonitor } from "@/components/dashboard/DataHealthMonitor";
+import { LayoutGrid, Eye, Scale, History, Activity, Menu, X, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const NAV_TABS = [
@@ -16,6 +17,7 @@ const NAV_TABS = [
   { id: "reasoning",  label: "Reasoning & Evidence", icon: Eye },
   { id: "fairness",   label: "Fairness & Risk", icon: Scale },
   { id: "audit",      label: "Audit Trail", icon: History },
+  { id: "health",     label: "Data Health", icon: Activity },
 ] as const;
 
 type TabId = (typeof NAV_TABS)[number]["id"];
@@ -188,6 +190,20 @@ export default function Index() {
               className="flex flex-col gap-4"
             >
               <AuditTrail />
+              <ProvenancePanel />
+            </motion.div>
+          )}
+
+          {activeTab === "health" && (
+            <motion.div
+              key="health"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="flex flex-col gap-4"
+            >
+              <DataHealthMonitor />
               <ProvenancePanel />
             </motion.div>
           )}
