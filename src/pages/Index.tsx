@@ -17,6 +17,7 @@ const NAV_TABS = [
   { id: "reasoning",  label: "Reasoning & Evidence", icon: Eye },
   { id: "fairness",   label: "Fairness & Risk", icon: Scale },
   { id: "audit",      label: "Audit Trail", icon: History },
+  { id: "health",     label: "Data Health", icon: Activity },
 ] as const;
 
 type TabId = (typeof NAV_TABS)[number]["id"];
