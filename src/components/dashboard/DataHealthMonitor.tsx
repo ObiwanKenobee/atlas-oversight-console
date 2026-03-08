@@ -308,7 +308,7 @@ export function DataHealthMonitor() {
               initial={{ opacity: 0, y: 4 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.04, duration: 0.25 }}
-              className={`group flex flex-col sm:flex-row sm:items-center gap-3 px-5 py-3.5 transition-colors hover:bg-surface-raised ${
+              className={`group flex flex-col sm:flex-row sm:items-center gap-3 px-5 py-3.5 transition-colors hover:bg-surface-elevated ${
                 pipeline.status === "broken" ? "bg-status-danger/3" : ""
               }`}
             >

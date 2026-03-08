@@ -8,7 +8,8 @@ import { AlternativesPanel } from "@/components/dashboard/AlternativesPanel";
 import { AuditTrail } from "@/components/dashboard/AuditTrail";
 import { HumanOverrideConsole } from "@/components/dashboard/HumanOverrideConsole";
 import { AlertCenter } from "@/components/dashboard/AlertCenter";
-import { LayoutGrid, Eye, Scale, History, Menu, X, ChevronRight } from "lucide-react";
+import { DataHealthMonitor } from "@/components/dashboard/DataHealthMonitor";
+import { LayoutGrid, Eye, Scale, History, Activity, Menu, X, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const NAV_TABS = [
