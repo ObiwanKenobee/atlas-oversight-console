@@ -139,5 +139,5 @@
   .fill-strong-pos  { background: hsl(var(--status-danger)); }
   .fill-medium-pos  { background: hsl(var(--status-warn)); }
   .fill-weak-pos    { background: hsl(var(--status-info)); }
-  .fill-negative    { background: hsl(160 58% 40%)); }
+  .fill-negative    { background: hsl(160 58% 40%); }
 }
