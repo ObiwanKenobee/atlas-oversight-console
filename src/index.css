@@ -2,95 +2,93 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* ─── ATLAS ETHICAL OVERSIGHT DASHBOARD — Design System ───────────────────── */
+/* All colors MUST be HSL. Never write raw hex/rgb in components. */
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* ── Core surfaces */
+    --background:        220 22% 7%;
+    --surface:           220 18% 10%;
+    --surface-elevated:  220 16% 13%;
+    --surface-hover:     220 14% 16%;
+    --foreground:        210 20% 92%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    /* ── Cards */
+    --card:              220 18% 10%;
+    --card-foreground:   210 20% 92%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    /* ── Popover */
+    --popover:           220 18% 12%;
+    --popover-foreground:210 20% 92%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* ── Primary — steel blue */
+    --primary:           214 72% 55%;
+    --primary-foreground:220 22% 7%;
+    --primary-muted:     214 40% 30%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* ── Secondary */
+    --secondary:         220 16% 18%;
+    --secondary-foreground:210 15% 75%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* ── Muted */
+    --muted:             220 16% 15%;
+    --muted-foreground:  215 12% 50%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* ── Accent — soft teal */
+    --accent:            193 60% 48%;
+    --accent-foreground: 220 22% 7%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* ── Semantic status colours */
+    --status-pass:       160 58% 40%;
+    --status-pass-bg:    160 40% 10%;
+    --status-warn:       38 90% 52%;
+    --status-warn-bg:    38 60% 10%;
+    --status-danger:     0  72% 52%;
+    --status-danger-bg:  0  50% 10%;
+    --status-info:       214 72% 55%;
+    --status-info-bg:    214 40% 12%;
+    --status-neutral:    215 12% 55%;
+    --status-neutral-bg: 215 12% 14%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* ── Destructive */
+    --destructive:       0  72% 52%;
+    --destructive-foreground:210 20% 92%;
 
-    --radius: 0.5rem;
+    /* ── Borders & inputs */
+    --border:            220 14% 18%;
+    --border-strong:     220 14% 28%;
+    --input:             220 14% 18%;
+    --ring:              214 72% 55%;
 
-    --sidebar-background: 0 0% 98%;
+    /* ── Radius */
+    --radius:            0.4rem;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+    /* ── Sidebar (reuse surface tokens) */
+    --sidebar-background:220 22% 6%;
+    --sidebar-foreground:210 15% 70%;
+    --sidebar-primary:   214 72% 55%;
+    --sidebar-primary-foreground:220 22% 7%;
+    --sidebar-accent:    220 16% 14%;
+    --sidebar-accent-foreground:210 20% 88%;
+    --sidebar-border:    220 14% 14%;
+    --sidebar-ring:      214 72% 55%;
 
-    --sidebar-primary: 240 5.9% 10%;
+    /* ── Typography */
+    --font-sans:   'IBM Plex Sans', system-ui, sans-serif;
+    --font-mono:   'IBM Plex Mono', 'Fira Code', monospace;
 
-    --sidebar-primary-foreground: 0 0% 98%;
+    /* ── Gradients */
+    --gradient-header:   linear-gradient(135deg, hsl(220 22% 8%), hsl(220 20% 11%));
+    --gradient-card:     linear-gradient(160deg, hsl(220 18% 11%), hsl(220 16% 9%));
+    --gradient-primary:  linear-gradient(135deg, hsl(var(--primary)), hsl(193 60% 48%));
 
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* ── Shadows */
+    --shadow-card:       0 1px 3px hsl(220 22% 3% / 0.6), 0 4px 16px hsl(220 22% 3% / 0.3);
+    --shadow-elevated:   0 2px 8px hsl(220 22% 3% / 0.7), 0 8px 32px hsl(220 22% 3% / 0.4);
+    --shadow-glow-blue:  0 0 20px hsl(214 72% 55% / 0.15);
   }
 }
 
@@ -99,7 +97,47 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-sans);
   }
+
+  code, pre, .mono {
+    font-family: var(--font-mono);
+  }
+
+  /* ── Scrollbar styling */
+  ::-webkit-scrollbar        { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track  { background: hsl(var(--background)); }
+  ::-webkit-scrollbar-thumb  { background: hsl(var(--border-strong)); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground)); }
+}
+
+/* ── Utility classes used across dashboard ──────────────────────────────────── */
+@layer utilities {
+  .surface         { background: hsl(var(--surface)); }
+  .surface-elevated{ background: hsl(var(--surface-elevated)); }
+  .border-subtle   { border-color: hsl(var(--border)); }
+  .border-strong   { border-color: hsl(var(--border-strong)); }
+  .text-mono       { font-family: var(--font-mono); }
+  .gradient-card   { background: var(--gradient-card); }
+
+  /* Status badge utilities */
+  .badge-pass    { background: hsl(var(--status-pass-bg));    color: hsl(var(--status-pass));    border: 1px solid hsl(var(--status-pass) / 0.3); }
+  .badge-warn    { background: hsl(var(--status-warn-bg));    color: hsl(var(--status-warn));    border: 1px solid hsl(var(--status-warn) / 0.3); }
+  .badge-danger  { background: hsl(var(--status-danger-bg));  color: hsl(var(--status-danger));  border: 1px solid hsl(var(--status-danger) / 0.3); }
+  .badge-info    { background: hsl(var(--status-info-bg));    color: hsl(var(--status-info));    border: 1px solid hsl(var(--status-info) / 0.3); }
+  .badge-neutral { background: hsl(var(--status-neutral-bg)); color: hsl(var(--status-neutral)); border: 1px solid hsl(var(--status-neutral) / 0.3); }
+
+  /* Contribution bar fills */
+  .fill-strong-pos  { background: hsl(var(--status-danger)); }
+  .fill-medium-pos  { background: hsl(var(--status-warn)); }
+  .fill-weak-pos    { background: hsl(var(--status-info)); }
+  .fill-negative    { background: hsl(160 58% 40%)); }
 }
