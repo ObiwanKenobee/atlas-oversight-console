@@ -9,18 +9,43 @@ import { AuditTrail } from "@/components/dashboard/AuditTrail";
 import { HumanOverrideConsole } from "@/components/dashboard/HumanOverrideConsole";
 import { AlertCenter } from "@/components/dashboard/AlertCenter";
 import { DataHealthMonitor } from "@/components/dashboard/DataHealthMonitor";
-import { LayoutGrid, Eye, Scale, History, Activity, Menu, X, ChevronRight } from "lucide-react";
+import { CounterfactualBuilder } from "@/components/dashboard/CounterfactualBuilder";
+import { TransparencyReport } from "@/components/dashboard/TransparencyReport";
+import { ModelVersionComparison } from "@/components/dashboard/ModelVersionComparison";
+import { AppealsWorkflow } from "@/components/dashboard/AppealsWorkflow";
+import {
+  LayoutGrid,
+  Eye,
+  Scale,
+  History,
+  Activity,
+  FlaskConical,
+  FileText,
+  GitCompare,
+  Gavel,
+  Menu,
+  X,
+  ChevronRight,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const NAV_TABS = [
-  { id: "overview",   label: "Overview",   icon: LayoutGrid },
-  { id: "reasoning",  label: "Reasoning & Evidence", icon: Eye },
-  { id: "fairness",   label: "Fairness & Risk", icon: Scale },
-  { id: "audit",      label: "Audit Trail", icon: History },
-  { id: "health",     label: "Data Health", icon: Activity },
+  { id: "overview",       label: "Overview",            icon: LayoutGrid  },
+  { id: "reasoning",      label: "Reasoning",           icon: Eye         },
+  { id: "fairness",       label: "Fairness & Risk",     icon: Scale       },
+  { id: "audit",          label: "Audit Trail",         icon: History     },
+  { id: "health",         label: "Data Health",         icon: Activity    },
+  { id: "scenarios",      label: "Scenarios",           icon: FlaskConical },
+  { id: "versions",       label: "Model Versions",      icon: GitCompare  },
+  { id: "appeals",        label: "Appeals",             icon: Gavel       },
+  { id: "report",         label: "Report",              icon: FileText    },
 ] as const;
 
 type TabId = (typeof NAV_TABS)[number]["id"];
+
+// Split nav into two rows: primary (always shown) and secondary (overflow)
+const PRIMARY_TABS = NAV_TABS.slice(0, 5);
+const SECONDARY_TABS = NAV_TABS.slice(5);
 
 function NavBar({ activeTab, setActiveTab }: { activeTab: TabId; setActiveTab: (t: TabId) => void }) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -46,13 +71,30 @@ function NavBar({ activeTab, setActiveTab }: { activeTab: TabId; setActiveTab: (
             </div>
           </div>
 
-          {/* Desktop nav tabs */}
-          <nav className="hidden md:flex items-center gap-1">
+          {/* Desktop nav — primary row */}
+          <nav className="hidden lg:flex items-center gap-1">
             {NAV_TABS.map(({ id, label, icon: Icon }) => (
               <button
                 key={id}
                 onClick={() => setActiveTab(id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-colors ${
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded text-xs font-medium transition-colors whitespace-nowrap ${
+                  activeTab === id
+                    ? "bg-surface text-foreground border border-border"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5" />{label}
+              </button>
+            ))}
+          </nav>
+
+          {/* Tablet: primary only */}
+          <nav className="hidden md:flex lg:hidden items-center gap-1">
+            {PRIMARY_TABS.map(({ id, label, icon: Icon }) => (
+              <button
+                key={id}
+                onClick={() => setActiveTab(id)}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded text-xs font-medium transition-colors ${
                   activeTab === id
                     ? "bg-surface text-foreground border border-border"
                     : "text-muted-foreground hover:text-foreground"
@@ -75,10 +117,18 @@ function NavBar({ activeTab, setActiveTab }: { activeTab: TabId; setActiveTab: (
             >
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
+            {/* Tablet extra menu */}
+            <button
+              onClick={() => setMobileOpen(v => !v)}
+              className="hidden md:flex lg:hidden items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors border border-border rounded px-2 py-1"
+            >
+              <Menu className="w-3.5 h-3.5" />
+              More
+            </button>
           </div>
         </div>
 
-        {/* Mobile nav */}
+        {/* Mobile/overflow nav */}
         <AnimatePresence>
           {mobileOpen && (
             <motion.div
@@ -86,10 +136,16 @@ function NavBar({ activeTab, setActiveTab }: { activeTab: TabId; setActiveTab: (
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="overflow-hidden md:hidden border-t border-border"
+              className="overflow-hidden border-t border-border"
             >
               <div className="py-2 flex flex-col gap-1">
-                {NAV_TABS.map(({ id, label, icon: Icon }) => (
+                {/* On mobile show all; on tablet show secondary only */}
+                {NAV_TABS.filter(t =>
+                  // on mobile show all
+                  window.innerWidth < 768 ||
+                  // on tablet show secondary (overflow)
+                  SECONDARY_TABS.some(s => s.id === t.id)
+                ).map(({ id, label, icon: Icon }) => (
                   <button
                     key={id}
                     onClick={() => { setActiveTab(id); setMobileOpen(false); }}
@@ -117,30 +173,20 @@ export default function Index() {
       <NavBar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <main className="max-w-[1600px] mx-auto px-4 lg:px-6 py-5 flex flex-col gap-4">
-        {/* ── Always-visible alert center */}
+        {/* Always-visible alert center */}
         <AlertCenter />
 
-        {/* ── Always-visible decision summary bar */}
+        {/* Always-visible decision summary bar */}
         <DecisionSummaryBar />
 
-        {/* ── Tab-gated content */}
+        {/* Tab-gated content */}
         <AnimatePresence mode="wait">
           {activeTab === "overview" && (
-            <motion.div
-              key="overview"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              className="flex flex-col gap-4"
-            >
-              {/* Row 2: Reasoning + Uncertainty */}
+            <motion.div key="overview" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="flex flex-col gap-4">
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
                 <ReasoningPanel />
                 <UncertaintyPanel />
               </div>
-
-              {/* Row 3: Alternatives + Override Console */}
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
                 <AlternativesPanel />
                 <HumanOverrideConsole />
@@ -149,14 +195,7 @@ export default function Index() {
           )}
 
           {activeTab === "reasoning" && (
-            <motion.div
-              key="reasoning"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              className="flex flex-col gap-4"
-            >
+            <motion.div key="reasoning" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="flex flex-col gap-4">
               <ReasoningPanel />
               <ProvenancePanel />
               <UncertaintyPanel />
@@ -164,14 +203,7 @@ export default function Index() {
           )}
 
           {activeTab === "fairness" && (
-            <motion.div
-              key="fairness"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              className="flex flex-col gap-4"
-            >
+            <motion.div key="fairness" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="flex flex-col gap-4">
               <FairnessPanel />
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
                 <AlternativesPanel />
@@ -181,30 +213,42 @@ export default function Index() {
           )}
 
           {activeTab === "audit" && (
-            <motion.div
-              key="audit"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              className="flex flex-col gap-4"
-            >
+            <motion.div key="audit" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="flex flex-col gap-4">
               <AuditTrail />
               <ProvenancePanel />
             </motion.div>
           )}
 
           {activeTab === "health" && (
-            <motion.div
-              key="health"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              className="flex flex-col gap-4"
-            >
+            <motion.div key="health" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="flex flex-col gap-4">
               <DataHealthMonitor />
               <ProvenancePanel />
+            </motion.div>
+          )}
+
+          {activeTab === "scenarios" && (
+            <motion.div key="scenarios" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="flex flex-col gap-4">
+              <CounterfactualBuilder />
+              <UncertaintyPanel />
+            </motion.div>
+          )}
+
+          {activeTab === "versions" && (
+            <motion.div key="versions" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="flex flex-col gap-4">
+              <ModelVersionComparison />
+            </motion.div>
+          )}
+
+          {activeTab === "appeals" && (
+            <motion.div key="appeals" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="flex flex-col gap-4">
+              <AppealsWorkflow />
+              <AuditTrail />
+            </motion.div>
+          )}
+
+          {activeTab === "report" && (
+            <motion.div key="report" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="flex flex-col gap-4">
+              <TransparencyReport />
             </motion.div>
           )}
         </AnimatePresence>
