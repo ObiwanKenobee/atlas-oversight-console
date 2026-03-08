@@ -44,9 +44,9 @@ function EventRow({ event, isLast }: { event: AuditEvent; isLast: boolean }) {
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-xs font-medium text-foreground">{event.event}</span>
                 <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
-                  event.status === "pass" ? "badge-pass" :
-                  event.status === "warn" ? "badge-warn" :
-                  event.status === "danger" ? "badge-danger" : "badge-neutral"
+                  (event.status as string) === "pass" ? "badge-pass" :
+                  (event.status as string) === "warn" ? "badge-warn" :
+                  (event.status as string) === "danger" ? "badge-danger" : "badge-neutral"
                 }`}>{event.actorRole}</span>
               </div>
               <div className="flex items-center gap-2 mt-0.5">
