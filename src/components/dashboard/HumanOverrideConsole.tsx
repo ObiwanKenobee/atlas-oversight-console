@@ -49,7 +49,7 @@ export function HumanOverrideConsole() {
           <>
             <div className="grid grid-cols-2 gap-2">
               {actions.map(action => {
-                const { Icon } = action;
+                const Icon = action.icon;
                 const isActive = activeAction === action.id;
                 const btnCls = {
                   pass:   "border-status-pass/40 hover:bg-status-pass-bg hover:border-status-pass/70 text-status-pass",
