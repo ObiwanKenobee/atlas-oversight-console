@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 function RobustnessChip({ r }: { r: typeof uncertaintyData.robustness }) {
   return (
     <span className={`text-xs font-mono px-2.5 py-1 rounded ${
-      r === "Stable" ? "badge-pass" : r === "Fragile" ? "badge-danger" : "badge-warn"
+      (r as string) === "Stable" ? "badge-pass" : (r as string) === "Fragile" ? "badge-danger" : "badge-warn"
     }`}>{r}</span>
   );
 }

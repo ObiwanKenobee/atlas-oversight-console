@@ -45,9 +45,9 @@ function ConfidenceArc({ value }: { value: number }) {
 
 export function DecisionSummaryBar() {
   const d = decisionMeta;
-  const ethicsVariant = d.ethicsStatus === "Passed" ? "pass" : d.ethicsStatus === "Needs Review" ? "warn" : "danger";
-  const humanVariant  = d.humanStatus  === "Approved" ? "pass" : d.humanStatus === "Rejected" ? "danger" : d.humanStatus === "Overridden" ? "warn" : "neutral";
-  const riskVariant   = d.riskLevel === "High" ? "danger" : d.riskLevel === "Medium" ? "warn" : "pass";
+  const ethicsVariant: "pass" | "warn" | "danger" = d.ethicsStatus === ("Passed" as string) ? "pass" : d.ethicsStatus === ("Needs Review" as string) ? "warn" : "danger";
+  const humanVariant: "pass" | "warn" | "danger" | "neutral"  = d.humanStatus  === ("Approved" as string) ? "pass" : d.humanStatus === ("Rejected" as string) ? "danger" : d.humanStatus === ("Overridden" as string) ? "warn" : "neutral";
+  const riskVariant: "pass" | "warn" | "danger"   = d.riskLevel === ("High" as string) ? "danger" : d.riskLevel === ("Medium" as string) ? "warn" : "pass";
 
   return (
     <motion.div
