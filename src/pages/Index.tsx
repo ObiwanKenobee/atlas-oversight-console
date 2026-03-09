@@ -15,9 +15,11 @@ import { ModelVersionComparison } from "@/components/dashboard/ModelVersionCompa
 import { AppealsWorkflow } from "@/components/dashboard/AppealsWorkflow";
 import { DecisionComparison } from "@/components/dashboard/DecisionComparison";
 import { GovernanceSummary } from "@/components/dashboard/GovernanceSummary";
+import { PolicyCompliancePanel } from "@/components/dashboard/PolicyCompliancePanel";
 import { NotificationCenter } from "@/components/dashboard/NotificationCenter";
 import { useNotifications } from "@/hooks/use-notifications";
 import { useSimulation } from "@/hooks/use-simulation";
+import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { useTheme } from "next-themes";
 import {
   LayoutGrid,
@@ -38,21 +40,24 @@ import {
   Moon,
   Zap,
   ZapOff,
+  Shield,
+  Keyboard,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const NAV_TABS = [
-  { id: "overview",    label: "Overview",        icon: LayoutGrid  },
-  { id: "reasoning",   label: "Reasoning",       icon: Eye         },
-  { id: "fairness",    label: "Fairness & Risk",  icon: Scale       },
-  { id: "audit",       label: "Audit Trail",     icon: History     },
-  { id: "health",      label: "Data Health",     icon: Activity    },
-  { id: "scenarios",   label: "Scenarios",       icon: FlaskConical },
-  { id: "versions",    label: "Model Versions",  icon: GitCompare  },
-  { id: "appeals",     label: "Appeals",         icon: Gavel       },
-  { id: "compare",     label: "Compare",         icon: Columns     },
-  { id: "governance",  label: "Governance",      icon: Building2   },
-  { id: "report",      label: "Report",          icon: FileText    },
+  { id: "overview",    label: "Overview",        icon: LayoutGrid,  shortcut: "1" },
+  { id: "reasoning",   label: "Reasoning",       icon: Eye,         shortcut: "2" },
+  { id: "fairness",    label: "Fairness & Risk",  icon: Scale,       shortcut: "3" },
+  { id: "audit",       label: "Audit Trail",     icon: History,     shortcut: "4" },
+  { id: "health",      label: "Data Health",     icon: Activity,    shortcut: "5" },
+  { id: "scenarios",   label: "Scenarios",       icon: FlaskConical, shortcut: "6" },
+  { id: "versions",    label: "Model Versions",  icon: GitCompare,  shortcut: "7" },
+  { id: "appeals",     label: "Appeals",         icon: Gavel,       shortcut: "8" },
+  { id: "compare",     label: "Compare",         icon: Columns,     shortcut: "9" },
+  { id: "compliance",  label: "Compliance",      icon: Shield,      shortcut: "0" },
+  { id: "governance",  label: "Governance",      icon: Building2,   shortcut: null },
+  { id: "report",      label: "Report",          icon: FileText,    shortcut: null },
 ] as const;
 
 type TabId = (typeof NAV_TABS)[number]["id"];
@@ -69,10 +74,99 @@ function ThemeToggle() {
     <button
       onClick={() => setTheme(isDark ? "light" : "dark")}
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      title={isDark ? "Switch to light mode" : "Switch to dark mode"}
       className="hidden sm:flex items-center justify-center w-7 h-7 rounded border border-border text-muted-foreground hover:text-foreground hover:border-border-strong transition-colors"
     >
       {isDark ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
     </button>
+  );
+}
+
+// ── Keyboard Shortcut Modal ───────────────────────────────────────────────────
+
+function ShortcutModal({ onClose }: { onClose: () => void }) {
+  return (
+    <AnimatePresence>
+      <motion.div
+        key="backdrop"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 bg-background/70 backdrop-blur-sm flex items-center justify-center p-4"
+        onClick={onClose}
+      >
+        <motion.div
+          key="modal"
+          initial={{ opacity: 0, scale: 0.96, y: 12 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.96, y: 12 }}
+          transition={{ duration: 0.18 }}
+          onClick={(e) => e.stopPropagation()}
+          className="bg-card border border-border rounded-xl shadow-elevated w-full max-w-md flex flex-col overflow-hidden"
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+            <div className="flex items-center gap-2">
+              <Keyboard className="w-4 h-4 text-accent" />
+              <h2 className="text-sm font-semibold text-foreground">Keyboard Shortcuts</h2>
+            </div>
+            <button
+              onClick={onClose}
+              aria-label="Close shortcuts"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Body */}
+          <div className="p-5 flex flex-col gap-5">
+            {/* Tab navigation */}
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-3">Tab Navigation</p>
+              <div className="grid grid-cols-2 gap-1.5">
+                {NAV_TABS.filter((t) => t.shortcut && t.shortcut !== "0").map((tab) => (
+                  <div key={tab.id} className="flex items-center justify-between gap-2 px-2 py-1.5 rounded bg-muted/50">
+                    <div className="flex items-center gap-2">
+                      <tab.icon className="w-3 h-3 text-muted-foreground" />
+                      <span className="text-xs text-foreground">{tab.label}</span>
+                    </div>
+                    <kbd className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface border border-border text-muted-foreground">
+                      {tab.shortcut}
+                    </kbd>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Global shortcuts */}
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-3">Global</p>
+              <div className="flex flex-col gap-1.5">
+                {[
+                  { key: "?", label: "Open keyboard shortcuts" },
+                  { key: "←", label: "Previous tab (in nav focus)" },
+                  { key: "→", label: "Next tab (in nav focus)" },
+                  { key: "Home", label: "First tab (in nav focus)" },
+                  { key: "End", label: "Last tab (in nav focus)" },
+                ].map(({ key, label }) => (
+                  <div key={key} className="flex items-center justify-between gap-2 px-2 py-1.5 rounded bg-muted/50">
+                    <span className="text-xs text-foreground">{label}</span>
+                    <kbd className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface border border-border text-muted-foreground whitespace-nowrap">
+                      {key}
+                    </kbd>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <p className="text-[10px] text-muted-foreground text-center">
+              Shortcuts are disabled when focus is inside an input field.
+            </p>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
   );
 }
 
@@ -89,6 +183,7 @@ interface NavBarProps {
   onDismiss: (id: string) => void;
   simEnabled: boolean;
   onToggleSim: () => void;
+  onOpenShortcuts: () => void;
 }
 
 function NavBar({
@@ -102,11 +197,12 @@ function NavBar({
   onDismiss,
   simEnabled,
   onToggleSim,
+  onOpenShortcuts,
 }: NavBarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  // Keyboard arrow navigation
+  // Keyboard arrow navigation within the nav
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent, idx: number) => {
       const tabs = NAV_TABS;
@@ -154,13 +250,13 @@ function NavBar({
             </div>
           </div>
 
-          {/* Desktop nav — all tabs with role="tablist" */}
+          {/* Desktop nav */}
           <nav
             aria-label="Dashboard sections"
             className="hidden lg:flex items-center gap-1"
             role="tablist"
           >
-            {NAV_TABS.map(({ id, label, icon: Icon }, idx) => {
+            {NAV_TABS.map(({ id, label, icon: Icon, shortcut }, idx) => {
               const badge = tabBadges[id] ?? 0;
               const isActive = activeTab === id;
               return (
@@ -174,6 +270,7 @@ function NavBar({
                   tabIndex={isActive ? 0 : -1}
                   onClick={() => setActiveTab(id)}
                   onKeyDown={(e) => handleKeyDown(e, idx)}
+                  title={shortcut ? `${label} (${shortcut})` : label}
                   className={`relative flex items-center gap-1.5 px-2.5 py-1.5 rounded text-xs font-medium transition-colors whitespace-nowrap ${
                     isActive
                       ? "bg-surface text-foreground border border-border"
@@ -223,7 +320,7 @@ function NavBar({
             })}
           </nav>
 
-          {/* Right: sim toggle + theme + notifications + version + mobile toggle */}
+          {/* Right controls */}
           <div className="flex items-center gap-2">
             {/* Live simulation toggle */}
             <button
@@ -248,6 +345,16 @@ function NavBar({
                   <span className="hidden md:inline">Simulate</span>
                 </>
               )}
+            </button>
+
+            {/* Keyboard shortcuts help button */}
+            <button
+              onClick={onOpenShortcuts}
+              aria-label="Keyboard shortcuts (?)"
+              title="Keyboard shortcuts (?)"
+              className="hidden sm:flex items-center justify-center w-7 h-7 rounded border border-border text-muted-foreground hover:text-foreground hover:border-border-strong transition-colors"
+            >
+              <Keyboard className="w-3.5 h-3.5" />
             </button>
 
             <ThemeToggle />
@@ -322,7 +429,7 @@ function NavBar({
                     </button>
                   );
                 })}
-                {/* Mobile: sim + theme */}
+                {/* Mobile: sim + shortcuts */}
                 <div className="flex items-center gap-2 px-3 py-2 border-t border-border mt-1 pt-2">
                   <button
                     onClick={onToggleSim}
@@ -334,6 +441,13 @@ function NavBar({
                   >
                     {simEnabled ? <Zap className="w-3 h-3" /> : <ZapOff className="w-3 h-3" />}
                     {simEnabled ? "Live ON" : "Simulate"}
+                  </button>
+                  <button
+                    onClick={() => { onOpenShortcuts(); setMobileOpen(false); }}
+                    className="flex items-center gap-1.5 px-2 py-1 rounded border border-border text-xs text-muted-foreground"
+                  >
+                    <Keyboard className="w-3 h-3" />
+                    Shortcuts
                   </button>
                 </div>
               </div>
@@ -350,6 +464,8 @@ function NavBar({
 export default function Index() {
   const [activeTab, setActiveTab] = useState<TabId>("overview");
   const [simEnabled, setSimEnabled] = useState(false);
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
+
   const {
     notifications,
     addNotification,
@@ -360,20 +476,24 @@ export default function Index() {
     unreadCount,
   } = useNotifications();
 
-  // Live simulation — fires events every 30 s when enabled
+  // Live simulation — fires breach events every 30 s when enabled
   useSimulation(simEnabled);
+
+  // Global keyboard shortcuts: 1–9 → tabs, ? → shortcuts modal
+  useKeyboardShortcuts({
+    tabs: NAV_TABS as unknown as { id: string }[],
+    setActiveTab: setActiveTab as (id: string) => void,
+    onHelpOpen: () => setShortcutsOpen(true),
+  });
 
   const mainRef = useRef<HTMLElement>(null);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Skip-to-main link for keyboard/screen-reader users */}
+      {/* Skip-to-main link */}
       <a
         href="#main-content"
-        onClick={(e) => {
-          e.preventDefault();
-          mainRef.current?.focus();
-        }}
+        onClick={(e) => { e.preventDefault(); mainRef.current?.focus(); }}
         className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:bg-card focus:border focus:border-accent focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-foreground"
       >
         Skip to main content
@@ -390,6 +510,7 @@ export default function Index() {
         onDismiss={dismiss}
         simEnabled={simEnabled}
         onToggleSim={() => setSimEnabled((v) => !v)}
+        onOpenShortcuts={() => setShortcutsOpen(true)}
       />
 
       <main
@@ -399,13 +520,8 @@ export default function Index() {
         className="max-w-[1600px] mx-auto px-4 lg:px-6 py-5 flex flex-col gap-4 outline-none"
         aria-label="Dashboard content"
       >
-        {/* ARIA live region for confidence/scenario updates */}
-        <div
-          aria-live="polite"
-          aria-atomic="true"
-          className="sr-only"
-          id="live-region"
-        />
+        {/* ARIA live region */}
+        <div aria-live="polite" aria-atomic="true" className="sr-only" id="live-region" />
 
         {/* Always-visible zones */}
         <AlertCenter />
@@ -415,11 +531,7 @@ export default function Index() {
         <AnimatePresence mode="wait">
 
           {activeTab === "overview" && (
-            <motion.div
-              key="overview"
-              role="tabpanel"
-              id="tabpanel-overview"
-              aria-labelledby="tab-overview"
+            <motion.div key="overview" role="tabpanel" id="tabpanel-overview" aria-labelledby="tab-overview"
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
               className="flex flex-col gap-4"
             >
@@ -435,11 +547,7 @@ export default function Index() {
           )}
 
           {activeTab === "reasoning" && (
-            <motion.div
-              key="reasoning"
-              role="tabpanel"
-              id="tabpanel-reasoning"
-              aria-labelledby="tab-reasoning"
+            <motion.div key="reasoning" role="tabpanel" id="tabpanel-reasoning" aria-labelledby="tab-reasoning"
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
               className="flex flex-col gap-4"
             >
@@ -450,11 +558,7 @@ export default function Index() {
           )}
 
           {activeTab === "fairness" && (
-            <motion.div
-              key="fairness"
-              role="tabpanel"
-              id="tabpanel-fairness"
-              aria-labelledby="tab-fairness"
+            <motion.div key="fairness" role="tabpanel" id="tabpanel-fairness" aria-labelledby="tab-fairness"
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
               className="flex flex-col gap-4"
             >
@@ -467,11 +571,7 @@ export default function Index() {
           )}
 
           {activeTab === "audit" && (
-            <motion.div
-              key="audit"
-              role="tabpanel"
-              id="tabpanel-audit"
-              aria-labelledby="tab-audit"
+            <motion.div key="audit" role="tabpanel" id="tabpanel-audit" aria-labelledby="tab-audit"
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
               className="flex flex-col gap-4"
             >
@@ -481,11 +581,7 @@ export default function Index() {
           )}
 
           {activeTab === "health" && (
-            <motion.div
-              key="health"
-              role="tabpanel"
-              id="tabpanel-health"
-              aria-labelledby="tab-health"
+            <motion.div key="health" role="tabpanel" id="tabpanel-health" aria-labelledby="tab-health"
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
               className="flex flex-col gap-4"
             >
@@ -495,11 +591,7 @@ export default function Index() {
           )}
 
           {activeTab === "scenarios" && (
-            <motion.div
-              key="scenarios"
-              role="tabpanel"
-              id="tabpanel-scenarios"
-              aria-labelledby="tab-scenarios"
+            <motion.div key="scenarios" role="tabpanel" id="tabpanel-scenarios" aria-labelledby="tab-scenarios"
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
               className="flex flex-col gap-4"
             >
@@ -509,11 +601,7 @@ export default function Index() {
           )}
 
           {activeTab === "versions" && (
-            <motion.div
-              key="versions"
-              role="tabpanel"
-              id="tabpanel-versions"
-              aria-labelledby="tab-versions"
+            <motion.div key="versions" role="tabpanel" id="tabpanel-versions" aria-labelledby="tab-versions"
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
               className="flex flex-col gap-4"
             >
@@ -522,11 +610,7 @@ export default function Index() {
           )}
 
           {activeTab === "appeals" && (
-            <motion.div
-              key="appeals"
-              role="tabpanel"
-              id="tabpanel-appeals"
-              aria-labelledby="tab-appeals"
+            <motion.div key="appeals" role="tabpanel" id="tabpanel-appeals" aria-labelledby="tab-appeals"
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
               className="flex flex-col gap-4"
             >
@@ -536,11 +620,7 @@ export default function Index() {
           )}
 
           {activeTab === "compare" && (
-            <motion.div
-              key="compare"
-              role="tabpanel"
-              id="tabpanel-compare"
-              aria-labelledby="tab-compare"
+            <motion.div key="compare" role="tabpanel" id="tabpanel-compare" aria-labelledby="tab-compare"
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
               className="flex flex-col gap-4"
             >
@@ -548,12 +628,17 @@ export default function Index() {
             </motion.div>
           )}
 
+          {activeTab === "compliance" && (
+            <motion.div key="compliance" role="tabpanel" id="tabpanel-compliance" aria-labelledby="tab-compliance"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
+              className="flex flex-col gap-4"
+            >
+              <PolicyCompliancePanel />
+            </motion.div>
+          )}
+
           {activeTab === "governance" && (
-            <motion.div
-              key="governance"
-              role="tabpanel"
-              id="tabpanel-governance"
-              aria-labelledby="tab-governance"
+            <motion.div key="governance" role="tabpanel" id="tabpanel-governance" aria-labelledby="tab-governance"
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
               className="flex flex-col gap-4"
             >
@@ -562,11 +647,7 @@ export default function Index() {
           )}
 
           {activeTab === "report" && (
-            <motion.div
-              key="report"
-              role="tabpanel"
-              id="tabpanel-report"
-              aria-labelledby="tab-report"
+            <motion.div key="report" role="tabpanel" id="tabpanel-report" aria-labelledby="tab-report"
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
               className="flex flex-col gap-4"
             >
@@ -588,6 +669,9 @@ export default function Index() {
           </span>
         </div>
       </footer>
+
+      {/* Keyboard shortcuts modal */}
+      {shortcutsOpen && <ShortcutModal onClose={() => setShortcutsOpen(false)} />}
     </div>
   );
 }
