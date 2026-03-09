@@ -305,7 +305,7 @@ export function DecisionSummaryBar() {
                 {fairnessData.dimensions.map((dim) => (
                   <div key={dim.name} className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground truncate">{dim.name}</span>
-                    <span className={`font-mono text-[10px] ml-2 shrink-0 ${dim.status === "pass" ? "text-status-pass" : dim.status === "warn" ? "text-status-warn" : "text-status-danger"}`}>
+                    <span className={`font-mono text-[10px] ml-2 shrink-0 ${(dim.status as string) === "pass" ? "text-status-pass" : (dim.status as string) === "warn" ? "text-status-warn" : "text-status-danger"}`}>
                       {dim.status.toUpperCase()}
                     </span>
                   </div>
