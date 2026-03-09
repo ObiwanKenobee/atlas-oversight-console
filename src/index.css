@@ -8,6 +8,9 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
 
 @layer base {
+  /* ═══════════════════════════════════════
+     DARK MODE (default — Atlas dark theme)
+     ═══════════════════════════════════════ */
   :root {
     /* ── Core surfaces */
     --background:        220 22% 7%;
@@ -25,8 +28,8 @@
     --popover-foreground:210 20% 92%;
 
     /* ── Primary — steel blue */
-    --primary:           214 72% 55%;
-    --primary-foreground:220 22% 7%;
+    --primary:           214 72% 50%;
+    --primary-foreground:0 0% 100%;
     --primary-muted:     214 40% 30%;
 
     /* ── Secondary */
@@ -38,8 +41,8 @@
     --muted-foreground:  215 12% 50%;
 
     /* ── Accent — soft teal */
-    --accent:            193 60% 48%;
-    --accent-foreground: 220 22% 7%;
+    --accent:            193 60% 45%;
+    --accent-foreground: 0 0% 100%;
 
     /* ── Semantic status colours */
     --status-pass:       160 58% 40%;
@@ -66,11 +69,11 @@
     /* ── Radius */
     --radius:            0.4rem;
 
-    /* ── Sidebar (reuse surface tokens) */
+    /* ── Sidebar */
     --sidebar-background:220 22% 6%;
     --sidebar-foreground:210 15% 70%;
     --sidebar-primary:   214 72% 55%;
-    --sidebar-primary-foreground:220 22% 7%;
+    --sidebar-primary-foreground:0 0% 100%;
     --sidebar-accent:    220 16% 14%;
     --sidebar-accent-foreground:210 20% 88%;
     --sidebar-border:    220 14% 14%;
@@ -89,6 +92,71 @@
     --shadow-card:       0 1px 3px hsl(220 22% 3% / 0.6), 0 4px 16px hsl(220 22% 3% / 0.3);
     --shadow-elevated:   0 2px 8px hsl(220 22% 3% / 0.7), 0 8px 32px hsl(220 22% 3% / 0.4);
     --shadow-glow-blue:  0 0 20px hsl(214 72% 55% / 0.15);
+  }
+
+  /* ═══════════════════════════════════════
+     LIGHT MODE overrides
+     ═══════════════════════════════════════ */
+  .light {
+    --background:        210 20% 97%;
+    --surface:           0 0% 100%;
+    --surface-elevated:  210 16% 95%;
+    --surface-hover:     210 14% 92%;
+    --foreground:        220 22% 12%;
+
+    --card:              0 0% 100%;
+    --card-foreground:   220 22% 12%;
+
+    --popover:           0 0% 100%;
+    --popover-foreground:220 22% 12%;
+
+    --primary:           214 72% 44%;
+    --primary-foreground:0 0% 100%;
+    --primary-muted:     214 40% 75%;
+
+    --secondary:         210 16% 92%;
+    --secondary-foreground:220 14% 30%;
+
+    --muted:             210 14% 93%;
+    --muted-foreground:  215 12% 44%;
+
+    --accent:            193 60% 38%;
+    --accent-foreground: 0 0% 100%;
+
+    --status-pass:       160 50% 32%;
+    --status-pass-bg:    160 40% 92%;
+    --status-warn:       38 80% 38%;
+    --status-warn-bg:    38 60% 93%;
+    --status-danger:     0  65% 46%;
+    --status-danger-bg:  0  50% 94%;
+    --status-info:       214 65% 44%;
+    --status-info-bg:    214 50% 93%;
+    --status-neutral:    215 12% 40%;
+    --status-neutral-bg: 215 12% 93%;
+
+    --destructive:       0  65% 46%;
+    --destructive-foreground:0 0% 100%;
+
+    --border:            220 14% 84%;
+    --border-strong:     220 14% 72%;
+    --input:             220 14% 88%;
+    --ring:              214 72% 44%;
+
+    --sidebar-background:210 20% 95%;
+    --sidebar-foreground:220 14% 30%;
+    --sidebar-primary:   214 72% 44%;
+    --sidebar-primary-foreground:0 0% 100%;
+    --sidebar-accent:    210 16% 90%;
+    --sidebar-accent-foreground:220 14% 24%;
+    --sidebar-border:    220 14% 82%;
+    --sidebar-ring:      214 72% 44%;
+
+    --gradient-header:   linear-gradient(135deg, hsl(210 20% 97%), hsl(210 16% 94%));
+    --gradient-card:     linear-gradient(160deg, hsl(0 0% 100%), hsl(210 16% 97%));
+
+    --shadow-card:       0 1px 3px hsl(220 14% 60% / 0.15), 0 4px 16px hsl(220 14% 60% / 0.08);
+    --shadow-elevated:   0 2px 8px hsl(220 14% 60% / 0.2), 0 8px 32px hsl(220 14% 60% / 0.1);
+    --shadow-glow-blue:  0 0 20px hsl(214 72% 44% / 0.1);
   }
 }
 
