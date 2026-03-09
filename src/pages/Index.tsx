@@ -17,6 +17,8 @@ import { DecisionComparison } from "@/components/dashboard/DecisionComparison";
 import { GovernanceSummary } from "@/components/dashboard/GovernanceSummary";
 import { NotificationCenter } from "@/components/dashboard/NotificationCenter";
 import { useNotifications } from "@/hooks/use-notifications";
+import { useSimulation } from "@/hooks/use-simulation";
+import { useTheme } from "next-themes";
 import {
   LayoutGrid,
   Eye,
@@ -32,6 +34,10 @@ import {
   ChevronRight,
   Columns,
   Building2,
+  Sun,
+  Moon,
+  Zap,
+  ZapOff,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -54,6 +60,22 @@ type TabId = (typeof NAV_TABS)[number]["id"];
 const PRIMARY_TABS = NAV_TABS.slice(0, 5);
 const SECONDARY_TABS = NAV_TABS.slice(5);
 
+// ── Theme Toggle ──────────────────────────────────────────────────────────────
+
+function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
+  const isDark = theme === "dark";
+  return (
+    <button
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      className="hidden sm:flex items-center justify-center w-7 h-7 rounded border border-border text-muted-foreground hover:text-foreground hover:border-border-strong transition-colors"
+    >
+      {isDark ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+    </button>
+  );
+}
+
 // ── NavBar ────────────────────────────────────────────────────────────────────
 
 interface NavBarProps {
@@ -65,6 +87,8 @@ interface NavBarProps {
   onMarkRead: (id: string) => void;
   onMarkAllRead: () => void;
   onDismiss: (id: string) => void;
+  simEnabled: boolean;
+  onToggleSim: () => void;
 }
 
 function NavBar({
@@ -76,6 +100,8 @@ function NavBar({
   onMarkRead,
   onMarkAllRead,
   onDismiss,
+  simEnabled,
+  onToggleSim,
 }: NavBarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -159,7 +185,7 @@ function NavBar({
                   {badge > 0 && (
                     <span
                       aria-label={`${badge} unread`}
-                      className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-status-danger text-[9px] font-bold text-white flex items-center justify-center"
+                      className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-status-danger text-[9px] font-bold text-primary-foreground flex items-center justify-center"
                     >
                       {badge}
                     </span>
@@ -188,7 +214,7 @@ function NavBar({
                   <Icon className="w-3.5 h-3.5" aria-hidden="true" />
                   {label}
                   {badge > 0 && (
-                    <span aria-label={`${badge} unread`} className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-status-danger text-[9px] font-bold text-white flex items-center justify-center">
+                    <span aria-label={`${badge} unread`} className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-status-danger text-[9px] font-bold text-primary-foreground flex items-center justify-center">
                       {badge}
                     </span>
                   )}
@@ -197,8 +223,35 @@ function NavBar({
             })}
           </nav>
 
-          {/* Right: notifications + version + mobile toggle */}
+          {/* Right: sim toggle + theme + notifications + version + mobile toggle */}
           <div className="flex items-center gap-2">
+            {/* Live simulation toggle */}
+            <button
+              onClick={onToggleSim}
+              aria-label={simEnabled ? "Stop live simulation" : "Start live simulation"}
+              aria-pressed={simEnabled}
+              title={simEnabled ? "Live simulation ON — alerts fire every 30 s" : "Start live simulation"}
+              className={`hidden sm:flex items-center gap-1.5 px-2 py-1 rounded border text-xs font-medium transition-colors ${
+                simEnabled
+                  ? "border-status-pass text-status-pass bg-status-pass-bg"
+                  : "border-border text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {simEnabled ? (
+                <>
+                  <Zap className="w-3 h-3" aria-hidden="true" />
+                  <span className="hidden md:inline">Live</span>
+                </>
+              ) : (
+                <>
+                  <ZapOff className="w-3 h-3" aria-hidden="true" />
+                  <span className="hidden md:inline">Simulate</span>
+                </>
+              )}
+            </button>
+
+            <ThemeToggle />
+
             <NotificationCenter
               notifications={notifications}
               unreadCount={unreadCount}
@@ -262,13 +315,27 @@ function NavBar({
                       <Icon className="w-4 h-4" aria-hidden="true" />
                       {label}
                       {badge > 0 && (
-                        <span aria-label={`${badge} unread`} className="ml-auto w-5 h-5 rounded-full bg-status-danger text-[9px] font-bold text-white flex items-center justify-center">
+                        <span aria-label={`${badge} unread`} className="ml-auto w-5 h-5 rounded-full bg-status-danger text-[9px] font-bold text-primary-foreground flex items-center justify-center">
                           {badge}
                         </span>
                       )}
                     </button>
                   );
                 })}
+                {/* Mobile: sim + theme */}
+                <div className="flex items-center gap-2 px-3 py-2 border-t border-border mt-1 pt-2">
+                  <button
+                    onClick={onToggleSim}
+                    className={`flex items-center gap-1.5 px-2 py-1 rounded border text-xs font-medium transition-colors ${
+                      simEnabled
+                        ? "border-status-pass text-status-pass bg-status-pass-bg"
+                        : "border-border text-muted-foreground"
+                    }`}
+                  >
+                    {simEnabled ? <Zap className="w-3 h-3" /> : <ZapOff className="w-3 h-3" />}
+                    {simEnabled ? "Live ON" : "Simulate"}
+                  </button>
+                </div>
               </div>
             </motion.div>
           )}
@@ -282,6 +349,7 @@ function NavBar({
 
 export default function Index() {
   const [activeTab, setActiveTab] = useState<TabId>("overview");
+  const [simEnabled, setSimEnabled] = useState(false);
   const {
     notifications,
     addNotification,
@@ -291,6 +359,9 @@ export default function Index() {
     tabBadges,
     unreadCount,
   } = useNotifications();
+
+  // Live simulation — fires events every 30 s when enabled
+  useSimulation(simEnabled);
 
   const mainRef = useRef<HTMLElement>(null);
 
@@ -317,6 +388,8 @@ export default function Index() {
         onMarkRead={markRead}
         onMarkAllRead={markAllRead}
         onDismiss={dismiss}
+        simEnabled={simEnabled}
+        onToggleSim={() => setSimEnabled((v) => !v)}
       />
 
       <main
